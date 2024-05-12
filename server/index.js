@@ -5,6 +5,8 @@ import cors from 'cors';
 import http from 'http';
 import path from 'path'
 import { Server } from 'socket.io';
+import authRoutes from './routes/authRoutes.js';
+
 
 dotenv.config()
 
@@ -43,6 +45,8 @@ const userAgentMiddleware = (req, res, next) => {
 };
 
 app.use(userAgentMiddleware);
+
+app.use('/api/auth', authRoutes);
 
 const __dirname = path.resolve();
 
