@@ -4,10 +4,7 @@ const Home = () => {
   const [code, setCode] = useState('');
   const authorize = () => {
     fetch(
-      `${import.meta.env.NODE_ENV === 'development'
-        ? import.meta.env.VITE_DEV_BASE_URL
-        : import.meta.env.VITE_PROD_BASE_URL
-      }/api/auth/authorize-code/${code}`,
+      `https://buds-of-boston.onrender.com/api/auth/authorize-code/${code}`,
       {
         method: 'GET',
         headers: {
