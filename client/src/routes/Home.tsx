@@ -3,13 +3,19 @@ import Typewriter from '../components/common/Typewriter';
 const Home = () => {
   const [code, setCode] = useState('');
   const authorize = () => {
-    fetch(`http://localhost:5000/api/auth/authorize-code/${code}`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
+    fetch(
+      `${import.meta.env.NODE_ENV === 'development'
+        ? import.meta.env.VITE_DEV_BASE_URL
+        : import.meta.env.VITE_PROD_BASE_URL
+      }/api/auth/authorize-code/${code}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }
+    )
       .then((res) => {
         if (!res.ok) {
           console.log(res);
