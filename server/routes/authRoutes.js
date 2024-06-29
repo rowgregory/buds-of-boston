@@ -1,9 +1,8 @@
 import express from 'express';
 const router = express.Router();
-import {
-  authorizeCode,
-} from '../controllers/authController.js';
+import { login, register } from '../controllers/authController.js';
 
-router.route('/authorize-code/:token').get(authorizeCode)
+router.route('/login').post(login);
+router.route('/register').post(register);
 
 export default router;

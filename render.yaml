@@ -1,0 +1,61 @@
+services:
+  - name: backend
+    type: web
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    expose:
+      - '5000' # Expose port 5000 for the backend
+
+  - name: frontend
+    type: web
+    env: node
+    buildCommand: npm install
+    startCommand: npm run build && npm run start
+    expose:
+      - '5173' # Expose port 5173 for the frontend
+
+  - name: nginx
+    type: web
+    env: nginx
+    buildCommand: null
+    startCommand: nginx -g 'daemon off;'
+    nginxConfig: |
+      worker_processes auto;
+      events {}
+
+      http {
+        include mime.types;
+        default_type application/octet-stream;
+
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log /var/log/nginx/access.log main;
+
+        server {
+          listen 80;
+          server_name localhost;
+
+          location / {
+            proxy_pass http://frontend:5173;  # Adjust to match your frontend service name and port
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }
+
+          location /api/ {
+            proxy_pass https://buds-of-boston.onrender.com;  # Adjust to match your backend service name and port
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }
+        }
+      }
+    ports:
+      - 80:80
+    diskSize: 512
+    plan: starter

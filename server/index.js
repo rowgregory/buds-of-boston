@@ -1,63 +1,58 @@
-import express from 'express'
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import colors from 'colors';
 import cors from 'cors';
+import express from 'express';
 import http from 'http';
-import path from 'path'
 import { Server } from 'socket.io';
 import authRoutes from './routes/authRoutes.js';
+import codeRoutes from './routes/codeRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import maskIPv4 from './utils/maskIPv4.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import limiter from './utils/limiter.js';
 
-
-dotenv.config()
+dotenv.config();
 
 const app = express();
-app.use(express.json())
 app.use(cors());
+app.use(express.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin:
+      process.env.NODE_ENV === 'DEV'
+        ? ['http://localhost:5173', 'http://10.0.0.19:5173', 'http://localhost']
+        : 'https://buds-of-boston.onrender.com',
     methods: ['GET', 'POST'],
   },
 });
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
+app.use(limiter);
+app.use(maskIPv4);
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
+app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/product', productRoutes);
+app.use('/api/code', codeRoutes);
 
-  socket.on('message', (data) => {
-    console.log('Message received:', data);
-
-    io.emit('message', data);
-  });
-});
+io.on('connection', () => {});
 
 const PORT = process.env.PORT || 5000;
 
-const userAgentMiddleware = (req, res, next) => {
-  // Retrieve the user's user-agent information from the request headers
-  req.userAgent = req.get('User-Agent');
-  next();
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const buildPath = path.resolve(__dirname, '../client/dist');
+app.use(express.static(buildPath));
 
-app.use(userAgentMiddleware);
-
-app.use('/api/auth', authRoutes);
-
-const __dirname = path.resolve();
-
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname, 'dist')));
-
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-//   });
-// }
+app.get('*', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`.yellow);
 });
+
+export { io };
