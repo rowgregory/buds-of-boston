@@ -11,7 +11,7 @@ export default defineConfig({
     port: 5173, // Specify the port Vite should run on
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // Proxy API requests to your backend server
+        target: 'http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com', // Proxy API requests to your backend server
         changeOrigin: true,
         secure: false,
       },

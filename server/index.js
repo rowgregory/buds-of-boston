@@ -31,10 +31,6 @@ const io = new Server(server, {
   },
 });
 
-app.use('/socket.io', (req, res) => {
-  proxy.web(req, res, { target: 'http://localhost:5000' });
-});
-
 app.use(maskIPv4);
 
 app.use('/api/auth', authRoutes);

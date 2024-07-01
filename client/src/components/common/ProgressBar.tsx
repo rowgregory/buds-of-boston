@@ -9,7 +9,9 @@ const ProgressBar = () => {
   const progressBar = useSelector((state: any) => state.progressBar);
 
   useEffect(() => {
-    const socket = io('http://localhost:5000');
+    const socket = io('http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com', {
+      withCredentials: false,
+    });
 
     socket.on('progress', (progress) => {
       dispatch(toggleProgressBar(true))
