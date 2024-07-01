@@ -21,13 +21,9 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: [
-      'http://localhost:5173',
-      'http://10.0.0.19:5173',
-      'http://localhost',
-      'http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com',
-    ],
+    origin: 'http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com',
     methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 
