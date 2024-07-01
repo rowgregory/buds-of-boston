@@ -12,11 +12,9 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import maskIPv4 from './utils/maskIPv4.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import limiter from './utils/limiter.js';
 
 const app = express();
-// Trust proxy settings
-app.set('trust proxy', true);
+
 app.use(cors());
 app.use(express.json());
 
@@ -35,7 +33,6 @@ app.use('/socket.io', (req, res) => {
   proxy.web(req, res, { target: 'http://localhost:5000' });
 });
 
-app.use(limiter);
 app.use(maskIPv4);
 
 app.use('/api/auth', authRoutes);
