@@ -1,3 +1,4 @@
+dotenv.config();
 import dotenv from 'dotenv';
 import colors from 'colors';
 import cors from 'cors';
@@ -13,8 +14,6 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import limiter from './utils/limiter.js';
 
-dotenv.config();
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -28,6 +27,13 @@ const io = new Server(server, {
         : 'http://ec2-3-22-185-215.us-east-2.compute.amazonaws.com/',
     methods: ['GET', 'POST'],
   },
+});
+
+// Trust proxy settings
+app.set('trust proxy', true);
+
+app.use('/socket.io', (req, res) => {
+  proxy.web(req, res, { target: 'http://localhost:5000' });
 });
 
 app.use(limiter);
