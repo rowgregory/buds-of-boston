@@ -25,7 +25,7 @@ const io = new Server(server, {
     origin:
       process.env.NODE_ENV === 'DEV'
         ? ['http://localhost:5173', 'http://10.0.0.19:5173', 'http://localhost']
-        : 'https://buds-of-boston.onrender.com',
+        : 'http://ec2-3-22-185-215.us-east-2.compute.amazonaws.com/',
     methods: ['GET', 'POST'],
   },
 });
