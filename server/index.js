@@ -15,6 +15,8 @@ import path from 'path';
 import limiter from './utils/limiter.js';
 
 const app = express();
+// Trust proxy settings
+app.set('trust proxy', true);
 app.use(cors());
 app.use(express.json());
 
@@ -28,9 +30,6 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
-
-// Trust proxy settings
-app.set('trust proxy', true);
 
 app.use('/socket.io', (req, res) => {
   proxy.web(req, res, { target: 'http://localhost:5000' });
