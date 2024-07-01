@@ -1,6 +1,6 @@
 import expressAsyncHandler from 'express-async-handler';
 import prisma from '../../prisma/client.js';
-import { io } from '../index.js';
+// import { io } from '../index.js';
 
 /**
  @desc    Create product
@@ -9,16 +9,14 @@ import { io } from '../index.js';
 */
 const createProduct = expressAsyncHandler(async (req, res) => {
   try {
-    io.emit('progress', 10);
+    // io.emit('progress', 10);
     const product = await prisma.product.create({ data: req.body });
-    io.emit('progress', 50);
+    // io.emit('progress', 50);
     if (!product) {
-      io.emit('progress', 90);
-      return res
-        .status(404)
-        .json({ message: 'Error creating product', sliceName: 'productApi' });
+      // io.emit('progress', 90);
+      return res.status(404).json({ message: 'Error creating product', sliceName: 'productApi' });
     }
-    io.emit('progress', 90);
+    // io.emit('progress', 90);
     return res
       .status(200)
       .json({ message: 'Product created successfully', sliceName: 'productApi' });
@@ -34,26 +32,22 @@ const createProduct = expressAsyncHandler(async (req, res) => {
 */
 const updateProduct = expressAsyncHandler(async (req, res) => {
   try {
-    io.emit('progress', 10);
+    // io.emit('progress', 10);
     if (!req.body.id) {
-      io.emit('progress', 90);
-      return res
-        .status(404)
-        .json({ message: 'Error updating product', sliceName: 'productApi' });
+      // io.emit('progress', 90);
+      return res.status(404).json({ message: 'Error updating product', sliceName: 'productApi' });
     }
-    io.emit('progress', 40);
+    // io.emit('progress', 40);
     const product = await prisma.product.update({
       where: { id: Number(req.body.id) },
       data: req.body,
     });
-    io.emit('progress', 70);
+    // io.emit('progress', 70);
     if (!product) {
-      io.emit('progress', 90);
-      return res
-        .status(404)
-        .json({ message: 'Error updating product', sliceName: 'productApi' });
+      // io.emit('progress', 90);
+      return res.status(404).json({ message: 'Error updating product', sliceName: 'productApi' });
     }
-    io.emit('progress', 90);
+    // io.emit('progress', 90);
     return res
       .status(200)
       .json({ message: 'Product updated successfully', sliceName: 'productApi' });
@@ -71,9 +65,7 @@ const getProducts = expressAsyncHandler(async (req, res) => {
   try {
     const products = await prisma.product.findMany();
     if (!products) {
-      return res
-        .status(404)
-        .json({ message: 'Error fetching products', sliceName: 'productApi' });
+      return res.status(404).json({ message: 'Error fetching products', sliceName: 'productApi' });
     }
 
     return res.status(200).json({ products });
@@ -91,9 +83,7 @@ const getProduct = expressAsyncHandler(async (req, res) => {
   try {
     const product = await prisma.product.findFirst({ where: req.params.id });
     if (!product) {
-      return res
-        .status(404)
-        .json({ message: 'Error fetching product', sliceName: 'productApi' });
+      return res.status(404).json({ message: 'Error fetching product', sliceName: 'productApi' });
     }
 
     return res.status(200).json({ product });
@@ -109,9 +99,9 @@ const getProduct = expressAsyncHandler(async (req, res) => {
 */
 const deleteProduct = expressAsyncHandler(async (req, res) => {
   try {
-    io.emit('progress', 10);
+    // io.emit('progress', 10);
     await prisma.product.delete({ where: { id: +req.params.id } });
-    io.emit('progress', 90);
+    // io.emit('progress', 90);
     return res.status(200).json({ message: 'Product deleted successfully' });
   } catch (err) {
     return console.error(err.message);
