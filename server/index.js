@@ -4,43 +4,45 @@ import colors from 'colors';
 import cors from 'cors';
 import express from 'express';
 import http from 'http';
-// import { Server } from 'socket.io';
+import { Server } from 'socket.io';
 import authRoutes from './routes/authRoutes.js';
 import codeRoutes from './routes/codeRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import maskIPv4 from './utils/maskIPv4.js';
+import limiter from './utils/limiter.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
 const app = express();
 
-app.use(
-  cors({
-    origin: 'http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: 'http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com',
-//     methods: ['GET', 'POST'],
-//     credentials: true,
-//   },
-// });
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'https://buds-of-boston.onrender.com'],
+    methods: ['GET', 'POST'],
+  },
+});
 
 app.use(maskIPv4);
+app.use(limiter);
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+app.get('/status', (req, res) => {
+  res.status(200).send('OK');
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/code', codeRoutes);
 
-// io.on('connection', () => {});
+io.on('connection', () => {});
 
 const PORT = process.env.PORT || 5000;
 
@@ -57,4 +59,4 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`.yellow);
 });
 
-// export { io };
+export { io };

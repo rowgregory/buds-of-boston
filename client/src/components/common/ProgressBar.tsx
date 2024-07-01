@@ -1,31 +1,29 @@
-// import { Fragment, useEffect } from 'react';
-// import io from 'socket.io-client';
-// import { useAppDispatch } from '../../store';
-// import { setProgress, toggleProgressBar } from '../../features/progress-bar/progressBarSlice';
-// import { useSelector } from 'react-redux';
+import { Fragment, useEffect } from 'react';
+import io from 'socket.io-client';
+import { useAppDispatch } from '../../store';
+import { setProgress, toggleProgressBar } from '../../features/progress-bar/progressBarSlice';
+import { useSelector } from 'react-redux';
 
 const ProgressBar = () => {
-  // const dispatch = useAppDispatch()
-  // const progressBar = useSelector((state: any) => state.progressBar);
+  const dispatch = useAppDispatch()
+  const progressBar = useSelector((state: any) => state.progressBar);
 
-  // useEffect(() => {
-  //   const socket = io('http://ec2-18-191-243-44.us-east-2.compute.amazonaws.com', {
-  //     withCredentials: false,
-  //   });
+  useEffect(() => {
+    const socket = io('http://localhost:5000');
 
-  //   socket.on('progress', (progress) => {
-  //     dispatch(toggleProgressBar(true))
-  //     dispatch(setProgress(progress))
-  //   });
+    socket.on('progress', (progress) => {
+      dispatch(toggleProgressBar(true))
+      dispatch(setProgress(progress))
+    });
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
-    <div>
-      {/* {progressBar?.toggleProgressBar && (
+    <Fragment>
+      {progressBar?.toggleProgressBar && (
         <div className='fixed top-0 left-0 right-0 h-6 w-full z-10 bg-transparent'>
           <div
             id='progress-bar'
@@ -33,8 +31,8 @@ const ProgressBar = () => {
             style={{ width: `${progressBar?.progress}%` }}
           ></div>
         </div>
-      )} */}
-    </div>
+      )}
+    </Fragment>
   );
 };
 

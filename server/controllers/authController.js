@@ -2,7 +2,7 @@ import expressAsyncHandler from 'express-async-handler';
 import { generateToken } from '../utils/generateToken.js';
 import bcrypt from 'bcrypt';
 import prisma from '../../prisma/client.js';
-// import { io } from '../index.js';
+import { io } from '../index.js';
 
 /**
  @desc    Login
@@ -11,32 +11,32 @@ import prisma from '../../prisma/client.js';
 */
 const login = expressAsyncHandler(async (req, res) => {
   try {
-    // io.emit('progress', 15);
+    io.emit('progress', 15);
     const { username, password } = req.body;
     const user = await prisma.user.findFirst({ where: { username } });
-    // io.emit('progress', 30);
+    io.emit('progress', 30);
 
     if (!user) {
-      // io.emit('progress', 0);
+      io.emit('progress', 0);
       return res.status(404).json({ message: 'Invalid credentials', sliceName: 'authApi' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    // io.emit('progress', 45);
+    io.emit('progress', 45);
 
     if (!isPasswordValid) {
-      // io.emit('progress', 0);
+      io.emit('progress', 0);
       return res.status(401).json({ message: 'Invalid credentials', sliceName: 'authApi' });
     }
 
-    // io.emit('progress', 60);
+    io.emit('progress', 60);
 
     const token = generateToken(
       { username: user.username, isAdmin: user.isAdmin, id: user.id },
       '1d'
     );
 
-    // io.emit('progress', 80);
+    io.emit('progress', 80);
 
     req.user = { id: user.id, username: user.username, token, isAdmin: user.isAdmin };
 
