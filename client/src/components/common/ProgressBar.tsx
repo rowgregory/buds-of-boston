@@ -9,7 +9,12 @@ const ProgressBar = () => {
   const progressBar = useSelector((state: any) => state.progressBar);
 
   useEffect(() => {
-    const socket = io('https://buds-of-boston.onrender.com');
+    const socket = io('https://buds-of-boston.onrender.com', {
+      withCredentials: true,
+      extraHeaders: {
+        'Access-Control-Allow-Origin': 'https://buds-of-boston.vercel.app',
+      },
+    });
 
     socket.on('progress', (progress) => {
       dispatch(toggleProgressBar(true))
