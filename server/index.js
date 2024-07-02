@@ -18,18 +18,20 @@ const app = express();
 app.set('trust proxy', 1);
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'https://buds-of-boston.onrender.com',
-      'https://buds-of-boston.vercel.app',
-    ],
+    origin: ['http://localhost:5173', 'https://buds-of-boston.vercel.app'],
     methods: ['GET', 'POST'],
   })
 );
 app.use(express.json());
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'https://buds-of-boston.vercel.app'],
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
 
 app.use(maskIPv4);
 app.use(limiter);
