@@ -13,6 +13,7 @@ export default defineConfig({
       '/api': {
         target: 'https://buds-of-boston.onrender.com', // Proxy API requests to your backend server
         changeOrigin: true,
+        secure: true,
       },
     },
     hmr: {
