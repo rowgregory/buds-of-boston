@@ -3,10 +3,11 @@ import MagnifyingGlass from '../../components/svg/MagnifyingGlass';
 import { useDeleteProductMutation, useGetProductsQuery } from '../../services/productApi';
 import { Link } from 'react-router-dom';
 import useOutsideDetect from '../../utils/useOutsideDetect';
-import DeleteModal, { useDeleteModal } from '../../components/common/DeleteModal';
+import DeleteModal from '../../components/common/DeleteModal';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import ProductsTable from '../../components/tables/ProductsTable';
+import { useDeleteModal } from '../../utils/useDeleteModal';
 
 const Products = () => {
   const [text, setText] = useState('');

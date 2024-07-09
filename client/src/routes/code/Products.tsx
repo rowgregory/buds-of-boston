@@ -11,7 +11,7 @@ const Products = () => {
   const { token } = useParams() as { token: string };
   const navigate = useNavigate();
 
-  let { isLoading } = useGetProductsQuery();
+  const { isLoading } = useGetProductsQuery();
   const products = useSelector((state: RootState) => state.product.products);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const Products = () => {
     if (!tokenIsValid) {
       navigate('/');
     }
-  }, [token]);
+  }, [token, navigate]);
 
   return (
     <Fragment>

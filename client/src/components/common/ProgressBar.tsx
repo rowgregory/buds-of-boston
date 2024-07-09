@@ -21,7 +21,7 @@ const ProgressBar = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <Fragment>

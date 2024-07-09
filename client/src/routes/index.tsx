@@ -4,7 +4,7 @@ import LockScreen from './LockScreen';
 import ProgressBar from '../components/common/ProgressBar';
 import PrivateRoute from '../components/common/PrivateRoute';
 
-type LazyModulePromise<T = {}> = Promise<{ default: ComponentType<T> }>;
+type LazyModulePromise<T = Record<string, never>> = Promise<{ default: ComponentType<T> }>;
 
 const Auth = lazy((): LazyModulePromise => import('./auth'));
 const Code = lazy((): LazyModulePromise => import('./code'));

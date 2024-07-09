@@ -7,7 +7,7 @@ export interface ProductStatePayload {
   error: string | false | null;
   message: string | null;
   products: [] | null;
-  product: {} | null;
+  product: Record<string, never> | null;
 }
 
 export const initialProductState: ProductStatePayload = {

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Spinner from './Spinner';
 import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/react';
 import { setProgress, toggleProgressBar } from '../../features/progress-bar/progressBarSlice';
@@ -6,19 +5,7 @@ import { useAppDispatch } from '../../store';
 import { Delete } from '../../assets/sound-effects';
 import UIFx from 'uifx';
 
-export const useDeleteModal = () => {
-  const [show, setShow] = useState(false);
 
-  const openModal = () => {
-    setShow(true);
-  };
-
-  const closeModal = () => {
-    setShow(false);
-  };
-
-  return { show, openModal, closeModal };
-};
 
 const DeleteModal = ({ idAndName, deleteDocument, loading, hook }: any) => {
   const dispatch = useAppDispatch();
