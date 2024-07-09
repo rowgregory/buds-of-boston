@@ -18,8 +18,8 @@ const app = express();
 app.set('trust proxy', 1);
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://buds-of-boston.vercel.app'],
-    methods: ['GET', 'POST'],
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   })
 );
 app.use(express.json());
@@ -27,8 +27,8 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173', 'https://buds-of-boston.vercel.app'],
-    methods: ['GET', 'POST'],
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   },
 });

@@ -9,21 +9,12 @@ import prisma from '../../prisma/client.js';
 const fetchDashboardInfo = expressAsyncHandler(async (req, res) => {
   try {
     const productsCount = await prisma.product.count();
-    const mostRecentProduct = await prisma.product.findFirst({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
 
     const code = await prisma.code.findFirst();
 
-    res
-      .status(200)
-      .json({ info: { productsCount, code, createdAt: mostRecentProduct.createdAt } });
+    res.status(200).json({ info: { productsCount, code } });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: 'Error fetching dashboard info', sliceName: 'dashboardApi' });
+    res.status(500).json({ message: 'Error fetching dashboard info', sliceName: 'dashboardApi' });
   }
 });
 

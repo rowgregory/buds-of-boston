@@ -18,7 +18,14 @@ export const authApi = api.injectEndpoints({
         body,
       }),
     }),
+    verifyRegisterCode: build.mutation({
+      query: (body: any) => ({
+        url: `${BASE_URL}/verify-register-code`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useVerifyRegisterCodeMutation } = authApi;

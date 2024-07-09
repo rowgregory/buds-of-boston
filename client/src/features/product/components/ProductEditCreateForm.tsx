@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import Spinner from '../../../components/common/Spinner';
 
 const ProductEditCreateForm = ({
@@ -8,35 +9,44 @@ const ProductEditCreateForm = ({
   isEditMode,
   loadingCreate,
   loadingUpdate,
+  uploadingToFirebase,
 }: any) => {
   return (
     <form className='flex flex-col gap-y-4 border-[1px] border-zinc-800 rounded-lg py-12 px-8 bg-[#141418]'>
       <div className='grid grid-cols-12 gap-10'>
         <div className='col-span-12 md:col-span-5'>Upload an image of your product</div>
-        <div className='col-span-12 md:col-span-7 flex justify-center mx-auto items-center'>
-          <input
-            id='image-file'
-            type='file'
-            onChange={editPhotoHandler}
-            className='hidden'
-            name='image'
-          />
-          <label htmlFor='image-file' className='bg-zinc-950 w-full p-10 rounded-md'>
-            {inputs.image ? (
-              <img
-                src={inputs.image}
-                alt='Budz of Boston'
-                className='object-cover h-full w-full bg-zinc-900 rounded-md'
+        <div className='col-span-12 md:col-span-7 flex justify-center py-4 mx-auto w-full bg-zinc-950 cursor-pointer'>
+          {uploadingToFirebase ? (
+            <Spinner fill='fill-lime-400' />
+          ) : (
+            <Fragment>
+              <input
+                id='image-file'
+                type='file'
+                onChange={editPhotoHandler}
+                className='hidden'
+                name='image'
               />
-            ) : (
-              <div className='flex flex-col justify-center items-center'>
-                <i className='fa-solid fa-cloud-arrow-up fa-xl mb-2 bg-gray-800 rounded-full flex justify-center items-center h-12 w-12 text-gray-200'></i>
-                <p className='font-Matter-Regular underline text-gray-500'>
-                  Click to add photo
-                </p>
-              </div>
-            )}
-          </label>
+              <label htmlFor='image-file' className='rounded-md cursor-pointer'>
+                {inputs.image ? (
+                  <img
+                    src={inputs.image}
+                    alt='Dreambudz'
+                    className='object-cover h-40 w-40 bg-zinc-950 rounded-md'
+                  />
+                ) : (
+                  <div className='flex flex-col justify-center items-center'>
+                    <div className='h-12 w-12 flex items-center justify-center rounded-full bg-gray-800 mb-1'>
+                      <i className='fa-solid fa-cloud-arrow-up fa-xl mb-2 bg-gray-800 rounded-full flex justify-center items-center h-12 w-12 text-gray-200'></i>
+                    </div>
+                    <p className='font-Matter-Regular underline text-gray-500'>
+                      Click to add photo
+                    </p>
+                  </div>
+                )}
+              </label>
+            </Fragment>
+          )}
         </div>
       </div>
       <div className='h-[1px] w-full bg-zinc-800 my-12'></div>

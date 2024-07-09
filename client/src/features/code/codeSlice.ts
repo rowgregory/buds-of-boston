@@ -26,33 +26,28 @@ export const codeSlice = createSlice({
     resetCodeSuccess: (state) => {
       state.success = false;
       state.code = null;
+      state.message = null;
     },
     resetCodeError: (state) => {
       state.error = null;
       state.message = null;
     },
+    resetCodeSuccessOnly: (state) => {
+      state.success = false;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addMatcher(
-        codeApi.endpoints.verifyCode.matchFulfilled,
-        (state: any, { payload }: any) => {
-          state.success = payload.codeIsValid;
-          state.token = payload.token;
-        }
-      )
-      .addMatcher(
-        codeApi.endpoints.createCode.matchFulfilled,
-        (state: any, { payload }: any) => {
-          state.message = payload.message;
-        }
-      )
-      .addMatcher(
-        codeApi.endpoints.updateCode.matchFulfilled,
-        (state: any, { payload }: any) => {
-          state.message = payload.message;
-        }
-      )
+      .addMatcher(codeApi.endpoints.verifyCode.matchFulfilled, (state: any, { payload }: any) => {
+        state.success = payload.codeIsValid;
+        state.token = payload.token;
+      })
+      .addMatcher(codeApi.endpoints.createCode.matchFulfilled, (state: any, { payload }: any) => {
+        state.message = payload.message;
+      })
+      .addMatcher(codeApi.endpoints.updateCode.matchFulfilled, (state: any, { payload }: any) => {
+        state.message = payload.message;
+      })
       .addMatcher(codeApi.endpoints.getCode.matchFulfilled, (state: any, { payload }: any) => {
         state.code = payload.code;
       })
@@ -69,4 +64,4 @@ export const codeSlice = createSlice({
 
 export const codeReducer = codeSlice.reducer as Reducer<CodeStatePayload>;
 
-export const { resetCodeSuccess, resetCodeError } = codeSlice.actions;
+export const { resetCodeSuccess, resetCodeError, resetCodeSuccessOnly } = codeSlice.actions;

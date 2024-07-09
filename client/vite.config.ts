@@ -11,9 +11,9 @@ export default defineConfig({
     port: 5173, // Specify the port Vite should run on
     proxy: {
       '/api': {
-        target: 'https://buds-of-boston.onrender.com', // Proxy API requests to your backend server
+        // target: 'https://buds-of-boston.onrender.com', // Proxy API requests to your backend server
+        target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: true,
       },
     },
     hmr: {

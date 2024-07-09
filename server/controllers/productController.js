@@ -1,6 +1,6 @@
 import expressAsyncHandler from 'express-async-handler';
+import { io } from '../index.js';
 import prisma from '../../prisma/client.js';
-// import { io } from '../index.js';
 
 /**
  @desc    Create product
@@ -9,9 +9,9 @@ import prisma from '../../prisma/client.js';
 */
 const createProduct = expressAsyncHandler(async (req, res) => {
   try {
-    io.emit('progress', 10);
+    io.emit('progress', 30);
     const product = await prisma.product.create({ data: req.body });
-    io.emit('progress', 50);
+    io.emit('progress', 70);
     if (!product) {
       io.emit('progress', 90);
       return res.status(404).json({ message: 'Error creating product', sliceName: 'productApi' });

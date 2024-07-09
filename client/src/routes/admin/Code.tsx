@@ -8,41 +8,47 @@ import { useDisclosure } from '@chakra-ui/react';
 import Typewriter from '../../components/common/Typewriter';
 import Spinner from '../../components/common/Spinner';
 import { setProgress, toggleProgressBar } from '../../features/progress-bar/progressBarSlice';
-import { RootState, useAppDispatch } from '../../store';
-import UIFx from 'uifx';
-import cartoonBlinkFast from '../../assets/sound-effects/cartoon-blink-fast.mp3';
-import cartoonTipToes from '../../assets/sound-effects/ascent-cartoon-top-toes.mp3';
+import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import useCodeForm from '../../features/code/hooks/useCodeForm';
 import CodeModal from '../../features/code/components/CodeModal';
-import { useSelector } from 'react-redux';
+import useSoundEffect from '../../utils/useSoundEffect';
+import { AscendCartoonTopToes, CartoonBlinkFast } from '../../assets/sound-effects';
+import { resetCodeSuccessOnly } from '../../features/code/codeSlice';
 
 const Code = () => {
   const dispatch = useAppDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const blinkFast = new UIFx(cartoonBlinkFast);
-  const tipToes = new UIFx(cartoonTipToes);
-  const [createCode] = useCreateCodeMutation();
-  const [updateCode] = useUpdateCodeMutation();
+  const [createCode, { isLoading: loadingCreate }] = useCreateCodeMutation();
+  const [updateCode, { isLoading: loadingUpdate }] = useUpdateCodeMutation();
   const { isLoading } = useGetCodeQuery();
-  const code = useSelector((state: RootState) => state.code);
+  const code = useAppSelector((state: RootState) => state.code);
   const isEditMode = !!code?.code;
+
+  const codeUpdatedSoundEffect = useSoundEffect(CartoonBlinkFast);
+  const codeCreatedSoundEffect = useSoundEffect(AscendCartoonTopToes);
 
   const { handleInput, inputs } = useCodeForm(code);
   const [reveal, setReveal] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    dispatch(setProgress(0));
+    dispatch(toggleProgressBar(true));
+    dispatch(setProgress(10));
     if (isEditMode) {
       await updateCode(inputs)
         .unwrap()
         .then(() => {
+          dispatch(setProgress(75));
+          codeUpdatedSoundEffect?.play();
           dispatch(setProgress(100));
-          blinkFast.play();
-          dispatch(toggleProgressBar(false));
-          onClose();
-          setReveal(true);
+
+          setTimeout(() => {
+            onClose();
+            setReveal(true);
+            dispatch(setProgress(0));
+            dispatch(toggleProgressBar(false));
+            dispatch(resetCodeSuccessOnly());
+          }, 200);
         })
         .catch((err: any) => {
           dispatch(setProgress(0));
@@ -53,11 +59,17 @@ const Code = () => {
       await createCode(inputs)
         .unwrap()
         .then(() => {
+          dispatch(setProgress(75));
+          codeCreatedSoundEffect?.play();
           dispatch(setProgress(100));
-          tipToes.play();
-          dispatch(toggleProgressBar(false));
-          onClose();
-          setReveal(true);
+
+          setTimeout(() => {
+            dispatch(setProgress(0));
+            dispatch(toggleProgressBar(false));
+            onClose();
+            setReveal(true);
+            dispatch(resetCodeSuccessOnly());
+          }, 250);
         })
         .catch((err: any) => {
           dispatch(setProgress(0));
@@ -76,6 +88,8 @@ const Code = () => {
         handleInput={handleInput}
         inputs={inputs}
         handleSubmit={handleSubmit}
+        isLoading={loadingUpdate || loadingCreate}
+        codeUpdated={code.success}
       />
       <div className='min-h-screen pt-12 md:pt-16 px-[10px] sm:px-[16px] md:px-8 pb-3'>
         <div className='max-w-screen-lg w-full mx-auto'>
@@ -91,11 +105,7 @@ const Code = () => {
               <Spinner />
             ) : (
               <Fragment>
-                <Typewriter
-                  sentence={isEditMode ? 'Update' : 'Create'}
-                  speed={50}
-                  text='text-xs'
-                />
+                <Typewriter sentence={isEditMode ? 'Update' : 'Create'} speed={50} text='text-xs' />
                 {isEditMode ? (
                   <p
                     onClick={(e: MouseEvent<HTMLParagraphElement>) => {

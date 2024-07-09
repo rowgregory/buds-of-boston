@@ -30,7 +30,6 @@ const Dashboard = () => {
               <p className='uppercase font-thin tracking-wider text-sm'>Products</p>
               <h1 className='text-5xl font-semibold'>{dashboardInfo?.productsCount}</h1>
               <p className='text-xs text-white/50'>
-                Last created: {formatDateWithTimezone(dashboardInfo?.createdAt)}
               </p>
             </Fragment>
           )}

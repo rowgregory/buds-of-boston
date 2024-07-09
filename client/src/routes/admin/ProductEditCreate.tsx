@@ -2,59 +2,75 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCreateProductMutation, useUpdateProductMutation } from '../../services/productApi';
 import { useAppDispatch } from '../../store';
 import { setProgress, toggleProgressBar } from '../../features/progress-bar/progressBarSlice';
-import UIFx from 'uifx';
-import productUpdated from '../../assets/sound-effects/product-updated.mp3';
 import { uploadFileToFirebase } from '../../utils/firebase';
 import useProductForm from '../../features/product/hooks/useProductForm';
 import ProductEditCreateForm from '../../features/product/components/ProductEditCreateForm';
+import useSoundEffect from '../../utils/useSoundEffect';
+import { AscendMusicalMallet2, Error } from '../../assets/sound-effects';
+import { useState } from 'react';
 
 const ProductEditCreate = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [uploadingToFirebase, setUploadingToFireBase] = useState(false);
   const { state } = useLocation();
   const product = state?.product;
   const isEditMode = state?.isEditMode;
-  const updated = new UIFx(productUpdated);
   const { handleInput, inputs, setInputs } = useProductForm(product);
   const [createProduct, { isLoading: loadingCreate }] = useCreateProductMutation();
   const [updateProduct, { isLoading: loadingUpdate }] = useUpdateProductMutation();
+  const soundEffect = useSoundEffect(AscendMusicalMallet2);
+  const errorSoundEffect = useSoundEffect(Error);
+
+  const handleErrors = (err: any) => {
+    errorSoundEffect?.play()
+    dispatch(setProgress(0));
+    dispatch(toggleProgressBar(false));
+    console.error(err);
+  };
+
+  const handleSuccess = () => {
+    dispatch(setProgress(85));
+    soundEffect?.play();
+    dispatch(setProgress(100));
+    setTimeout(() => {
+      dispatch(setProgress(0));
+      dispatch(toggleProgressBar(false));
+      navigate('/admin/products');
+    }, 250);
+  };
+
+  const handleProductUpdate = async () => {
+    dispatch(setProgress(15));
+    await updateProduct({ ...inputs, id: product.id })
+      .unwrap()
+      .then(handleSuccess)
+      .catch(handleErrors);
+  };
+
+  const handleProductCreate = async () => {
+    dispatch(setProgress(15));
+    await createProduct(inputs)
+      .unwrap()
+      .then(handleSuccess)
+      .catch(handleErrors);
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (isEditMode) {
-      dispatch(setProgress(0));
-      await updateProduct({ ...inputs, id: product?.id })
-        .unwrap()
-        .then(() => {
-          dispatch(setProgress(100));
-          updated.play();
-          dispatch(toggleProgressBar(false));
-          navigate('/admin/products');
-        })
-        .catch((err: any) => {
-          dispatch(setProgress(0));
-          dispatch(toggleProgressBar(false));
-          console.error(err);
-        });
+    dispatch(toggleProgressBar(true));
+    dispatch(setProgress(5));
+    if (Boolean(isEditMode)) {
+      handleProductUpdate();
     } else {
-      await createProduct(inputs)
-        .unwrap()
-        .then(() => {
-          dispatch(setProgress(100));
-          updated.play();
-          dispatch(toggleProgressBar(false));
-          navigate('/admin/products');
-        })
-        .catch((err: any) => {
-          dispatch(setProgress(0));
-          dispatch(toggleProgressBar(false));
-          console.error(err);
-        });
+      handleProductCreate();
     }
   };
 
   const editPhotoHandler = async (e: any) => {
+    setUploadingToFireBase(true)
     const imgData: any = await uploadFileToFirebase(e.target.files[0]);
+    setUploadingToFireBase(false)
     setInputs((prev: any) => ({
       ...prev,
       image: imgData?.url,
@@ -79,6 +95,7 @@ const ProductEditCreate = () => {
         isEditMode={isEditMode}
         loadingCreate={loadingCreate}
         loadingUpdate={loadingUpdate}
+        uploadingToFirebase={uploadingToFirebase}
       />
     </div>
   );

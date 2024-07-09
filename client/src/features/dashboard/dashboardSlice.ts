@@ -9,7 +9,6 @@ export interface DashboardStatePayload {
   info: {
     productsCount: number;
     code: { updatedAt: string; code: string };
-    createdAt: string;
   } | null;
 }
 
@@ -43,8 +42,7 @@ export const dashboardSlice = createSlice({
       )
       .addMatcher(
         (action: any) =>
-          action.type.endsWith('/rejected') &&
-          action.payload?.data?.sliceName === 'dashboardApi',
+          action.type.endsWith('/rejected') && action.payload?.data?.sliceName === 'dashboardApi',
         (state: any, action: any) => {
           state.loading = false;
           state.error = action.payload.data;

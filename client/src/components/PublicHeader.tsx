@@ -4,7 +4,7 @@ import UIFx from 'uifx';
 import { DescendMusicalMallet } from '../assets/sound-effects';
 import { useSelector } from 'react-redux';
 import { setProgress, toggleProgressBar } from '../features/progress-bar/progressBarSlice';
-import { resetAuthSuccess } from '../features/auth/authSlice';
+import { resetAuth } from '../features/auth/authSlice';
 import { Image } from '@chakra-ui/react';
 import { Logo } from '../assets/images';
 
@@ -18,7 +18,7 @@ const PublicHeader = () => {
     dispatch(setProgress(0));
     descend.play();
     persistor.purge();
-    dispatch(resetAuthSuccess());
+    dispatch(resetAuth());
     dispatch(setProgress(100));
     dispatch(toggleProgressBar(false));
     navigate('/');

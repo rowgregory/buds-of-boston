@@ -59,11 +59,8 @@ const register = expressAsyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    if (username !== process.env.ADMIN_USERNAME && password !== process.env.ADMIN_PASSWORD) {
-      return res.status(404).json({ message: 'Invalid credentials', sliceName: 'authApi' });
-    }
-
     const existingUser = await prisma.user.findFirst({ where: { username } });
+
     if (existingUser)
       return res.status(404).json({ message: 'Invalid credentials', sliceName: 'authApi' });
 
@@ -91,4 +88,28 @@ const register = expressAsyncHandler(async (req, res) => {
   }
 });
 
-export { login, register };
+/**
+ @desc    Register
+ @route   POST /api/auth/verify-register-code
+ @access  Public
+*/
+const verifyRegisterCode = expressAsyncHandler(async (req, res) => {
+  const { code } = req.body;
+
+  try {
+    const codeToMatch = process.env.REGISTER_CODE;
+
+    if (codeToMatch !== code)
+      return res.status(404).json({ codeValidated: false, sliceName: 'authApi' });
+
+    res.status(200).json({ codeValidated: true });
+  } catch (err) {
+    res.json({
+      message: err.message,
+      name: err.name,
+      sliceName: 'authApi',
+    });
+  }
+});
+
+export { login, register, verifyRegisterCode };

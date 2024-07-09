@@ -7,8 +7,8 @@
 .input-box:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
   box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-text-fill-color: white !important;
-  color: white !important;
+  -webkit-text-fill-color: #a3e635 !important;
+  color: #a3e635 !important;
   background-color: transparent !important;
   background-clip: border-box !important;
   transition: background-color 5000s ease-in-out 0s !important;

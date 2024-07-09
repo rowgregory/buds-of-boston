@@ -27,7 +27,7 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState: initialAuthState,
   reducers: {
-    resetAuthSuccess: (state) => {
+    resetAuth: (state) => {
       state.success = false;
       state.isAuthenticated = false;
       state.accountWasCreated = false;
@@ -39,6 +39,9 @@ export const authSlice = createSlice({
       state.error = null;
       state.message = null;
       state.loading = false;
+    },
+    resetAuthSuccess: (state) => {
+      state.success = false;
     },
   },
   extraReducers: (builder) => {
@@ -53,6 +56,9 @@ export const authSlice = createSlice({
         state.token = payload.token;
         state.isAdmin = payload.isAdmin;
       })
+      .addMatcher(authApi.endpoints.verifyRegisterCode.matchFulfilled, (state: any) => {
+        state.success = true;
+      })
       .addMatcher(
         (action: any) =>
           action.type.endsWith('/rejected') && action.payload?.data?.sliceName === 'authApi',
@@ -66,4 +72,4 @@ export const authSlice = createSlice({
 
 export const authReducer = authSlice.reducer as Reducer<AuthStatePayload>;
 
-export const { resetAuthSuccess, resetAuthError } = authSlice.actions;
+export const { resetAuth, resetAuthError, resetAuthSuccess } = authSlice.actions;

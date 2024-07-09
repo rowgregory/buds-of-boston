@@ -9,7 +9,7 @@ const ProgressBar = () => {
   const progressBar = useSelector((state: any) => state.progressBar);
 
   useEffect(() => {
-    const socket = io('https://buds-of-boston.onrender.com', {
+    const socket = io('http://localhost:5000', {
       withCredentials: true,
     });
 

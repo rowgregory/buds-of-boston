@@ -1,79 +1,106 @@
-import { useState } from 'react';
-import Typewriter from '../../components/common/Typewriter';
-import { useRegisterMutation } from '../../services/authApi';
+import { FormEvent, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RootState, useAppDispatch } from '../../store';
+import Typewriter from '../../components/common/Typewriter';
+import { useRegisterMutation, useVerifyRegisterCodeMutation } from '../../services/authApi';
+import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { setProgress, toggleProgressBar } from '../../features/progress-bar/progressBarSlice';
-import UIFx from 'uifx';
-import { CartoonPop1 } from '../../assets/sound-effects';
-import { useSelector } from 'react-redux';
+import useForm from '../../utils/useForm';
+import useSoundEffect from '../../utils/useSoundEffect';
+import { AscendMusicalMallet, DescendMusicalMallet } from '../../assets/sound-effects';
+import { resetAuthSuccess } from '../../features/auth/authSlice';
+import RegisterForm from '../../features/auth/components/RegisterForm';
+import Lock from '../../features/code/components/Lock';
 
 const Register = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [inputs, setInputs] = useState({ username: '', password: '' });
-  const pop = new UIFx(CartoonPop1);
-  const [register] = useRegisterMutation();
-  const auth = useSelector((state: RootState) => state.auth)
+  const inputRef = useRef(null) as any;
+  const [code, setCode] = useState('');
+  const { inputs, handleInput } = useForm(['username', 'password']);
+  const soundEffect = useSoundEffect(AscendMusicalMallet);
+  const failSoundEffect = useSoundEffect(DescendMusicalMallet);
+  const success = useAppSelector((state: RootState) => state.auth.success);
 
-  const handleInput = (e: any) => {
-    const { value, name } = e.target;
-    setInputs((prev: any) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [register, { isLoading }] = useRegisterMutation();
+  const [verifyRegisterCode] = useVerifyRegisterCodeMutation();
 
-  const handleRegister = async () => {
-    dispatch(setProgress(0));
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (inputs.password !== '' && inputs.username !== '') {
+      dispatch(toggleProgressBar(true));
+      dispatch(setProgress(15));
       await register({ username: inputs.username, password: inputs.password })
         .unwrap()
         .then((data: any) => {
           if (data.accountWasCreated) {
-            pop.play();
             dispatch(setProgress(100));
-            dispatch(toggleProgressBar(false));
+            soundEffect?.play();
             navigate('/admin/dashboard');
+            setTimeout(() => {
+              dispatch(toggleProgressBar(false));
+              dispatch(setProgress(0));
+              dispatch(resetAuthSuccess())
+            }, 250);
           }
         })
-        .catch((err: any) => {
-          dispatch(setProgress(100));
+        .catch(() => {
+          failSoundEffect?.play();
           dispatch(toggleProgressBar(false));
-          console.error(err)
+          dispatch(setProgress(0));
         });
     }
   };
 
+  const handleVerifyCode = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch(toggleProgressBar(true));
+    dispatch(setProgress(15));
+    await verifyRegisterCode({ code })
+      .unwrap()
+      .then((data: any) => {
+        dispatch(setProgress(75));
+        if (data?.codeValidated) {
+          dispatch(setProgress(100));
+          setTimeout(() => {
+            dispatch(setProgress(0));
+            dispatch(toggleProgressBar(false));
+          }, 100);
+        }
+      })
+      .catch(() => {
+        dispatch(setProgress(0));
+        dispatch(toggleProgressBar(false));
+        failSoundEffect?.play();
+        inputRef.current.value = '';
+        setCode('');
+      });
+  };
+
   return (
-    <div className='flex flex-col items-center overflow-hidden pt-40'>
-      <div className='flex flex-col'>
-        <Typewriter sentence='Register' speed={40} text='text-sm text-zinc-100 font-bold h-5' />
-        <div className='flex flex-col sm:flex-row items-center gap-3 mt-2'>
-          <input
-            autoComplete='off'
-            name='username'
-            type='text'
-            onChange={handleInput}
-            placeholder='Username'
-            className='text-lime-400 font-semibold text-sm focus:outline-none h-9 w-48 rounded-sm px-3 bg-zinc-900 placeholder:text-zinc-600'
+    <div className="flex flex-col items-center overflow-hidden pt-40">
+      {success ? (
+        <div className="flex flex-col">
+          <Typewriter
+            sentence={success ? 'Register' : 'Enter Code'}
+            speed={40}
+            text="text-sm text-zinc-100 font-bold h-5"
           />
-          <input
-            autoComplete='off'
-            name='password'
-            type='password'
-            onChange={handleInput}
-            placeholder='Password'
-            className='text-lime-400 font-semibold text-sm focus:outline-none h-9 w-48 rounded-sm px-3 bg-zinc-900 placeholder:text-zinc-600'
+          <RegisterForm
+            handleSubmit={handleRegister}
+            handleInput={handleInput}
+            isLoading={isLoading}
           />
-          <button onClick={handleRegister} className='text-sm font-bold'>
-            <i
-              className={`fa-solid ${auth?.accountWasCreated ? 'fa-lock-open' : 'fa-lock'
-                } fa-lg text-zinc-400 w-5 hover:text-zinc-500 duration-200`}
-            ></i>
-          </button>
         </div>
-      </div>
+      ) : (
+        <Lock
+          inputRef={inputRef}
+          setCode={setCode}
+          code={code}
+          handleVerifyCode={handleVerifyCode}
+          isLoading={isLoading}
+          success={success}
+        />
+      )}
     </div>
   );
 };

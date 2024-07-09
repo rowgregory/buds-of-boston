@@ -1,26 +1,32 @@
 import { Image } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
-import UIFx from 'uifx';
 import { persistor, useAppDispatch } from '../../../store';
-import { resetAuthSuccess } from '../../auth/authSlice';
+import { resetAuth } from '../../auth/authSlice';
 import { DescendMusicalMallet } from '../../../assets/sound-effects';
 import { setProgress, toggleProgressBar } from '../../progress-bar/progressBarSlice';
 import { Logo } from '../../../assets/images';
+import useSoundEffect from '../../../utils/useSoundEffect';
 
 const AdminMobileNavigation = ({ toggleMobileMenu, close }: any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const descend = new UIFx(DescendMusicalMallet);
+  const soundEffect = useSoundEffect(DescendMusicalMallet)
 
   const handleLogout = () => {
+    close()
+    dispatch(toggleProgressBar(true));
     dispatch(setProgress(0));
-    descend.play();
+    soundEffect?.play();
     persistor.purge();
-    dispatch(resetAuthSuccess());
+    dispatch(setProgress(50));
+    dispatch(resetAuth());
     dispatch(setProgress(100));
-    dispatch(toggleProgressBar(false));
-    close();
     navigate('/auth/login');
+
+    setTimeout(() => {
+      dispatch(toggleProgressBar(false));
+      dispatch(setProgress(0));
+    }, 200)
   };
 
   return (
